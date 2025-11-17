@@ -1,0 +1,86 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #1e1e1e;
+    color: white;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding-top: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #17d317;
+}
+
+.subtitle {
+    text-align: center;
+    color: #bbb;
+}
+
+.tabs {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.tab-button {
+    background: #2b2b2b;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 5px;
+}
+
+.tab-button.active {
+    background: #17d317;
+    color: black;
+}
+
+.tab {
+    display: none;
+    margin-top: 20px;
+}
+
+.tab.active {
+    display: block;
+}
+
+.input {
+    width: 60%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: none;
+    background: #3a3a3a;
+    color: white;
+}
+
+.btn {
+    padding: 10px 20px;
+    background: #17d317;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.output {
+    background: #111;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+}
+
+.big {
+    height: 300px;
+    overflow-y: scroll;
+}
