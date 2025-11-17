@@ -84,3 +84,99 @@ h1 {
     height: 300px;
     overflow-y: scroll;
 }
+
+/* ===========================================
+   🔥 RESPONSIVE — VERSIONE MOBILE (< 768px)
+   =========================================== */
+@media (max-width: 768px) {
+    
+    body {
+        padding: 0;
+    }
+
+    .container {
+        width: 95%;
+        padding-top: 10px;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        padding: 0 10px;
+    }
+
+    /* Tabs più grandi e impilati */
+    .tabs {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .tab-button {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+    }
+
+    /* Input più larghi */
+    .input {
+        width: 100%;
+        font-size: 16px;
+        padding: 12px;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 17px;
+        margin-top: 15px;
+    }
+
+    .output {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    /* Output lungo scrollabile */
+    .big {
+        height: 200px;
+    }
+}
+
+/* ===========================================
+   🔥 VERSIONE ULTRA MOBILE (< 480px)
+   =========================================== */
+@media (max-width: 480px) {
+
+    h1 {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        font-size: 13px;
+    }
+
+    .tab-button {
+        font-size: 15px;
+        padding: 12px;
+        border-radius: 6px;
+    }
+
+    .input {
+        font-size: 15px;
+        padding: 10px;
+    }
+
+    .btn {
+        font-size: 15px;
+        padding: 10px;
+    }
+
+    .output {
+        font-size: 13px;
+    }
+}
+
