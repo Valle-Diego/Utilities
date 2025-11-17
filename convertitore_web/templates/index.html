@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>CONVERTITORE+ (WEB)</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>CONVERTITORE+</h1>
+    <p class="subtitle">Versione Web — Conversioni numeriche, IPv4, IPv6, Classful, CIDR e Subnetting</p>
+
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab('num')">Sistemi Numerici</button>
+        <button class="tab-button" onclick="openTab('ipv4')">IPv4</button>
+        <button class="tab-button" onclick="openTab('ipv6')">IPv6</button>
+        <button class="tab-button" onclick="openTab('classful')">Classful</button>
+        <button class="tab-button" onclick="openTab('cidr')">CIDR</button>
+        <button class="tab-button" onclick="openTab('subnet')">Subnetting</button>
+    </div>
+
+    <!-- ================= SISTEMI NUMERICI ================= -->
+    <div id="num" class="tab active">
+        <h2>Convertitore Sistemi Numerici</h2>
+
+        <input id="num_val" class="input" placeholder="Inserisci valore">
+        <select id="num_base" class="input">
+            <option value="dec">Decimale</option>
+            <option value="bin">Binario</option>
+            <option value="oct">Ottale</option>
+            <option value="hex">Esadecimale</option>
+        </select>
+
+        <button onclick="convertiNumero()" class="btn">Converti</button>
+        <pre id="num_out" class="output"></pre>
+    </div>
+
+    <!-- ================= IPv4 ================= -->
+    <div id="ipv4" class="tab">
+        <h2>Convertitore IPv4</h2>
+
+        <input id="ipv4_val" class="input" placeholder="Inserisci IPv4">
+        <select id="ipv4_tipo" class="input">
+            <option value="dec_to_bin">Decimale → Binario</option>
+            <option value="bin_to_dec">Binario → Decimale</option>
+        </select>
+
+        <button onclick="convertiIPv4()" class="btn">Converti</button>
+        <pre id="ipv4_out" class="output"></pre>
+    </div>
+
+    <!-- ================= IPv6 ================= -->
+    <div id="ipv6" class="tab">
+        <h2>Convertitore IPv6</h2>
+
+        <input id="ipv6_val" class="input" placeholder="Inserisci IPv6">
+        <select id="ipv6_tipo" class="input">
+            <option value="hex_to_bin">Hex → Binario</option>
+            <option value="bin_to_hex">Binario → Hex</option>
+        </select>
+
+        <button onclick="convertiIPv6()" class="btn">Converti</button>
+        <pre id="ipv6_out" class="output"></pre>
+    </div>
+
+    <!-- ================= CLASSFUL ================= -->
+    <div id="classful" class="tab">
+        <h2>Analisi IPv4 Classful</h2>
+
+        <input id="classful_val" class="input" placeholder="Inserisci IPv4">
+
+        <button onclick="analizzaClassful()" class="btn">Analizza</button>
+        <pre id="classful_out" class="output"></pre>
+    </div>
+
+    <!-- ================= CIDR ================= -->
+    <div id="cidr" class="tab">
+        <h2>Analisi IPv4 CIDR</h2>
+
+        <input id="cidr_val" class="input" placeholder="Es: 192.168.1.0/24">
+
+        <button onclick="analizzaCIDR()" class="btn">Analizza</button>
+        <pre id="cidr_out" class="output"></pre>
+    </div>
+
+    <!-- ================= SUBNETTING ================= -->
+    <div id="subnet" class="tab">
+        <h2>Subnetting</h2>
+
+        <input id="subnet_network" class="input" placeholder="Rete es: 192.168.1.0/24">
+
+        <select id="subnet_mode" class="input">
+            <option value="num">Dividi in N subnet</option>
+            <option value="size">Sottoreti da X host</option>
+        </select>
+
+        <input id="subnet_value" class="input" placeholder="Es: 4 (subnet) oppure 50 (host)">
+
+        <button onclick="subnetting()" class="btn">Genera Subnet</button>
+        <pre id="subnet_out" class="output big"></pre>
+    </div>
+
+</div>
+
+<!-- JS -->
+<script>
+function openTab(name) {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".tab-button").forEach(t => t.classList.remove("active"));
+    document.getElementById(name).classList.add("active");
+    event.target.classList.add("active");
+}
+
+async function post(url, data) {
+    let res = await fetch(url, {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: new URLSearchParams(data)
+    });
+    return res.json();
+}
+
+async function convertiNumero() {
+    let data = await post("/converti", {
+        valore: num_val.value,
+        base: num_base.value
+    });
+    num_out.innerText = JSON.stringify(data, null, 2);
+}
+
+async function convertiIPv4() {
+    let data = await post("/ipv4", {
+        valore: ipv4_val.value,
+        tipo: ipv4_tipo.value
+    });
+    ipv4_out.innerText = JSON.stringify(data, null, 2);
+}
+
+async function convertiIPv6() {
+    let data = await post("/ipv6", {
+        valore: ipv6_val.value,
+        tipo: ipv6_tipo.value
+    });
+    ipv6_out.innerText = JSON.stringify(data, null, 2);
+}
+
+async function analizzaClassful() {
+    let data = await post("/classful", {
+        valore: classful_val.value
+    });
+    classful_out.innerText = JSON.stringify(data, null, 2);
+}
+
+async function analizzaCIDR() {
+    let data = await post("/classless", {
+        valore: cidr_val.value
+    });
+    cidr_out.innerText = JSON.stringify(data, null, 2);
+}
+
+async function subnetting() {
+    let data = await post("/subnetting", {
+        network: subnet_network.value,
+        mode: subnet_mode.value,
+        value: subnet_value.value
+    });
+    subnet_out.innerText = JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
