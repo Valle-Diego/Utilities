@@ -3,172 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CONVERTITORE+ (WEB)</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>CONVERTITORE+</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
 <div class="container">
-    <h1>CONVERTITORE+</h1>
-    <p class="subtitle">Versione Web — Conversioni numeriche, IPv4, IPv6, Classful, CIDR e Subnetting</p>
-
+    <h2>CONVERTITORE+</h2>
     <div class="tabs">
-        <button class="tab-button active" onclick="openTab('num')">Sistemi Numerici</button>
-        <button class="tab-button" onclick="openTab('ipv4')">IPv4</button>
-        <button class="tab-button" onclick="openTab('ipv6')">IPv6</button>
-        <button class="tab-button" onclick="openTab('classful')">Classful</button>
-        <button class="tab-button" onclick="openTab('cidr')">CIDR</button>
-        <button class="tab-button" onclick="openTab('subnet')">Subnetting</button>
+        <div class="tab active" data-tab="numeri">Sistemi Numerici</div>
+        <div class="tab" data-tab="ipv4">IPv4</div>
+        <div class="tab" data-tab="ipv6">IPv6</div>
+        <div class="tab" data-tab="classful">Classful</div>
+        <div class="tab" data-tab="classless">Classless</div>
+        <div class="tab" data-tab="vlsm">VLSM</div>
     </div>
 
-    <!-- ================= SISTEMI NUMERICI ================= -->
-    <div id="num" class="tab active">
-        <h2>Convertitore Sistemi Numerici</h2>
-
-        <input id="num_val" class="input" placeholder="Inserisci valore">
-        <select id="num_base" class="input">
-            <option value="dec">Decimale</option>
-            <option value="bin">Binario</option>
-            <option value="oct">Ottale</option>
-            <option value="hex">Esadecimale</option>
+    <div class="tab-content active" id="numeri">
+        <h3>Convertitore Base Numerica</h3>
+        <input type="text" id="num_val" placeholder="Inserisci numero">
+        <select id="num_base">
+            <option>Decimale</option>
+            <option>Binario</option>
+            <option>Ottale</option>
+            <option>Esadecimale</option>
         </select>
-
-        <button onclick="convertiNumero()" class="btn">Converti</button>
-        <pre id="num_out" class="output"></pre>
+        <button onclick="convertiNumero()">Converti</button>
+        <pre class="result-box" id="num_res"></pre>
     </div>
 
-    <!-- ================= IPv4 ================= -->
-    <div id="ipv4" class="tab">
-        <h2>Convertitore IPv4</h2>
-
-        <input id="ipv4_val" class="input" placeholder="Inserisci IPv4">
-        <select id="ipv4_tipo" class="input">
+    <div class="tab-content" id="ipv4">
+        <h3>IPv4</h3>
+        <input type="text" id="ipv4_val" placeholder="es: 192.168.1.1">
+        <select id="ipv4_tipo">
             <option value="dec_to_bin">Decimale → Binario</option>
             <option value="bin_to_dec">Binario → Decimale</option>
         </select>
-
-        <button onclick="convertiIPv4()" class="btn">Converti</button>
-        <pre id="ipv4_out" class="output"></pre>
+        <button onclick="convertiIPv4()">Converti</button>
+        <pre class="result-box" id="ipv4_res"></pre>
     </div>
 
-    <!-- ================= IPv6 ================= -->
-    <div id="ipv6" class="tab">
-        <h2>Convertitore IPv6</h2>
-
-        <input id="ipv6_val" class="input" placeholder="Inserisci IPv6">
-        <select id="ipv6_tipo" class="input">
-            <option value="hex_to_bin">Hex → Binario</option>
-            <option value="bin_to_hex">Binario → Hex</option>
+    <div class="tab-content" id="ipv6">
+        <h3>IPv6</h3>
+        <input type="text" id="ipv6_val" placeholder="es: 2001:db8::1">
+        <select id="ipv6_tipo">
+            <option value="hex_to_bin">Esadecimale → Binario</option>
+            <option value="bin_to_hex">Binario → Esadecimale</option>
         </select>
-
-        <button onclick="convertiIPv6()" class="btn">Converti</button>
-        <pre id="ipv6_out" class="output"></pre>
+        <button onclick="convertiIPv6()">Converti</button>
+        <pre class="result-box" id="ipv6_res"></pre>
     </div>
 
-    <!-- ================= CLASSFUL ================= -->
-    <div id="classful" class="tab">
-        <h2>Analisi IPv4 Classful</h2>
-
-        <input id="classful_val" class="input" placeholder="Inserisci IPv4">
-
-        <button onclick="analizzaClassful()" class="btn">Analizza</button>
-        <pre id="classful_out" class="output"></pre>
+    <div class="tab-content" id="classful">
+        <h3>Analisi Classful</h3>
+        <input type="text" id="classful_val" placeholder="es: 192.168.1.1">
+        <button onclick="analizzaClassful()">Analizza</button>
+        <pre class="result-box" id="classful_res"></pre>
     </div>
 
-    <!-- ================= CIDR ================= -->
-    <div id="cidr" class="tab">
-        <h2>Analisi IPv4 CIDR</h2>
-
-        <input id="cidr_val" class="input" placeholder="Es: 192.168.1.0/24">
-
-        <button onclick="analizzaCIDR()" class="btn">Analizza</button>
-        <pre id="cidr_out" class="output"></pre>
+    <div class="tab-content" id="classless">
+        <h3>Analisi Classless</h3>
+        <input type="text" id="classless_val" placeholder="es: 192.168.1.0/24">
+        <button onclick="analizzaClassless()">Analizza</button>
+        <pre class="result-box" id="classless_res"></pre>
     </div>
 
-    <!-- ================= SUBNETTING ================= -->
-    <div id="subnet" class="tab">
-        <h2>Subnetting</h2>
-
-        <input id="subnet_network" class="input" placeholder="Rete es: 192.168.1.0/24">
-
-        <select id="subnet_mode" class="input">
-            <option value="num">Dividi in N subnet</option>
-            <option value="size">Sottoreti da X host</option>
-        </select>
-
-        <input id="subnet_value" class="input" placeholder="Es: 4 (subnet) oppure 50 (host)">
-
-        <button onclick="subnetting()" class="btn">Genera Subnet</button>
-        <pre id="subnet_out" class="output big"></pre>
+    <div class="tab-content" id="vlsm">
+        <h3>VLSM Subnet Calculator</h3>
+        <input type="text" id="vlsm_rete" placeholder="Rete base CIDR es: 192.168.10.0/24">
+        <div id="vlsm_hosts">
+            <input type="text" class="vlsm_host" placeholder="Host richiesti">
+        </div>
+        <button onclick="aggiungiHost()">Aggiungi Riga</button>
+        <button onclick="calcolaVLSM()">Calcola</button>
+        <pre class="result-box" id="vlsm_res"></pre>
     </div>
-
 </div>
 
-<!-- JS -->
 <script>
-function openTab(name) {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    document.querySelectorAll(".tab-button").forEach(t => t.classList.remove("active"));
-    document.getElementById(name).classList.add("active");
-    event.target.classList.add("active");
+const tabs=document.querySelectorAll(".tab");
+tabs.forEach(t=>{
+    t.onclick=()=>{
+        tabs.forEach(x=>x.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(x=>x.classList.remove("active"));
+        t.classList.add("active");
+        document.getElementById(t.dataset.tab).classList.add("active");
+    };
+});
+
+async function convertiNumero(){
+    let val=document.getElementById("num_val").value;
+    let base=document.getElementById("num_base").value;
+    let res=await fetch("/api/converti",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({valore:val,base:base})});
+    document.getElementById("num_res").textContent=JSON.stringify(await res.json(),null,2);
 }
 
-async function post(url, data) {
-    let res = await fetch(url, {
-        method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: new URLSearchParams(data)
-    });
-    return res.json();
+async function convertiIPv4(){
+    let val=document.getElementById("ipv4_val").value;
+    let tipo=document.getElementById("ipv4_tipo").value;
+    let res=await fetch("/api/ipv4",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({valore:val,tipo:tipo})});
+    document.getElementById("ipv4_res").textContent=JSON.stringify(await res.json(),null,2);
 }
 
-async function convertiNumero() {
-    let data = await post("/converti", {
-        valore: num_val.value,
-        base: num_base.value
-    });
-    num_out.innerText = JSON.stringify(data, null, 2);
+async function convertiIPv6(){
+    let val=document.getElementById("ipv6_val").value;
+    let tipo=document.getElementById("ipv6_tipo").value;
+    let res=await fetch("/api/ipv6",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({valore:val,tipo:tipo})});
+    document.getElementById("ipv6_res").textContent=JSON.stringify(await res.json(),null,2);
 }
 
-async function convertiIPv4() {
-    let data = await post("/ipv4", {
-        valore: ipv4_val.value,
-        tipo: ipv4_tipo.value
-    });
-    ipv4_out.innerText = JSON.stringify(data, null, 2);
+async function analizzaClassful(){
+    let val=document.getElementById("classful_val").value;
+    let res=await fetch("/api/classful",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({valore:val})});
+    document.getElementById("classful_res").textContent=JSON.stringify(await res.json(),null,2);
 }
 
-async function convertiIPv6() {
-    let data = await post("/ipv6", {
-        valore: ipv6_val.value,
-        tipo: ipv6_tipo.value
-    });
-    ipv6_out.innerText = JSON.stringify(data, null, 2);
+async function analizzaClassless(){
+    let val=document.getElementById("classless_val").value;
+    let res=await fetch("/api/classless",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({valore:val})});
+    document.getElementById("classless_res").textContent=JSON.stringify(await res.json(),null,2);
 }
 
-async function analizzaClassful() {
-    let data = await post("/classful", {
-        valore: classful_val.value
-    });
-    classful_out.innerText = JSON.stringify(data, null, 2);
+function aggiungiHost(){
+    let div=document.createElement("div");
+    div.innerHTML='<input type="text" class="vlsm_host" placeholder="Host richiesti">';
+    document.getElementById("vlsm_hosts").appendChild(div);
 }
 
-async function analizzaCIDR() {
-    let data = await post("/classless", {
-        valore: cidr_val.value
-    });
-    cidr_out.innerText = JSON.stringify(data, null, 2);
-}
-
-async function subnetting() {
-    let data = await post("/subnetting", {
-        network: subnet_network.value,
-        mode: subnet_mode.value,
-        value: subnet_value.value
-    });
-    subnet_out.innerText = JSON.stringify(data, null, 2);
+async function calcolaVLSM(){
+    let rete=document.getElementById("vlsm_rete").value;
+    let hosts=[...document.querySelectorAll(".vlsm_host")].map(x=>parseInt(x.value)||0).filter(x=>x>0);
+    let res=await fetch("/api/vlsm",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({rete:rete,hosts:hosts})});
+    document.getElementById("vlsm_res").textContent=JSON.stringify(await res.json(),null,2);
 }
 </script>
-
 </body>
 </html>
