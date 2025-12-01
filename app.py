@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import ipaddress
+import math
 
 app = Flask(__name__)
 
@@ -109,16 +110,16 @@ def analizza_classless(cidr):
         "tipo": "Privato" if net.is_private else "Pubblico"
     }
 
-# -------------------- SUBNETTING --------------------
+# -------------------- SUBNETTING SEMPLICE --------------------
 def dividi_in_n_subnet(network, n):
     net = ipaddress.IPv4Network(network, strict=False)
-    bits = (n - 1).bit_length()  # aumento prefix
+    bits = (n - 1).bit_length()
     new_prefix = net.prefixlen + bits
     return [str(n) for n in net.subnets(new_prefix=new_prefix)]
 
 def dividi_per_host(network, host_count):
     net = ipaddress.IPv4Network(network, strict=False)
-    needed_hosts = host_count + 2  # include network + broadcast
+    needed_hosts = host_count + 2
 
     new_prefix = 32
     while (2 ** (32 - new_prefix)) < needed_hosts:
@@ -126,21 +127,45 @@ def dividi_per_host(network, host_count):
 
     return [str(n) for n in net.subnets(new_prefix=new_prefix)]
 
-@app.route("/subnetting", methods=["POST"])
-def subnetting():
-    network = request.form["network"]
-    mode = request.form["mode"]
-    value = request.form["value"]
-
+# -------------------- VLSM --------------------
+def calcola_vlsm(network_base, richieste):
+    """
+    network_base: es '192.168.1.0/24'
+    richieste: lista host es [50, 20, 5]
+    """
     try:
-        if mode == "num":
-            result = dividi_in_n_subnet(network, int(value))
-        else:
-            result = dividi_per_host(network, int(value))
-
-        return {"subnets": result}
+        base_net = ipaddress.ip_network(network_base, strict=False)
     except:
-        return {"errore": "Input non valido"}
+        return None, "Rete base non valida."
+
+    richieste = sorted(richieste, reverse=True)
+
+    risultati = []
+    current_ip = base_net.network_address
+
+    for host in richieste:
+        needed = host + 2
+        bits = math.ceil(math.log2(needed))
+        prefix = 32 - bits
+
+        if prefix < base_net.prefixlen:
+            return None, f"Impossibile allocare {host} host."
+
+        subnet = ipaddress.ip_network(f"{current_ip}/{prefix}", strict=False)
+
+        risultati.append({
+            "richiesta_host": host,
+            "network": str(subnet.network_address),
+            "broadcast": str(subnet.broadcast_address),
+            "mask": str(subnet.netmask),
+            "prefix": prefix,
+            "range": f"{subnet.network_address + 1} - {subnet.broadcast_address - 1}",
+            "host_disponibili": subnet.num_addresses - 2
+        })
+
+        current_ip = subnet.broadcast_address + 1
+
+    return risultati, None
 
 # -------------------- ROUTES WEB --------------------
 @app.route("/")
@@ -189,5 +214,39 @@ def classless():
     r = analizza_classless(valore)
     return r or {"errore": "CIDR non valido"}
 
+@app.route("/subnetting", methods=["POST"])
+def subnetting():
+    network = request.form["network"]
+    mode = request.form["mode"]
+    value = request.form["value"]
+
+    try:
+        if mode == "num":
+            result = dividi_in_n_subnet(network, int(value))
+        else:
+            result = dividi_per_host(network, int(value))
+
+        return {"subnets": result}
+    except:
+        return {"errore": "Input non valido"}
+
+# -------------------- ROUTE VLSM --------------------
+@app.route("/vlsm", methods=["POST"])
+def vlsm():
+    network = request.form["network"]
+    hosts_raw = request.form["hosts"]
+
+    try:
+        hosts = [int(x) for x in hosts_raw.split(",") if x.strip().isdigit()]
+    except:
+        return {"errore": "Lista host non valida"}
+
+    result, error = calcola_vlsm(network, hosts)
+
+    if error:
+        return {"errore": error}
+    return {"vlsm": result}
+
+# -------------------- RUN --------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
