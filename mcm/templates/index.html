@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Calcolatore MCD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Calcolatore MCD</h1>
+
+        <form method="POST">
+            <label>Primo numero:</label>
+            <input type="number" name="a" required>
+            
+            <label>Secondo numero:</label>
+            <input type="number" name="b" required>
+
+            <label>Metodo:</label>
+            <select name="method">
+                <option value="iterativo">Iterativo</option>
+                <option value="ricorsivo">Ricorsivo</option>
+            </select>
+
+            <button type="submit">Calcola MCD</button>
+        </form>
+
+        {% if result is not none %}
+            <div class="result">Il MCD è: {{ result }}</div>
+        {% endif %}
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>
