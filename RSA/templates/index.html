@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RSA Web App</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>RSA Web App</h1>
+        <form method="POST">
+            <label>p:</label>
+            <input type="number" name="p" required />
+
+            <label>q:</label>
+            <input type="number" name="q" required />
+
+            <label>e:</label>
+            <input type="number" name="e" required />
+
+            <label>Messaggio (numero):</label>
+            <input type="number" name="M" required />
+
+            <button type="submit">Cifra e Decifra</button>
+        </form>
+
+        {% if result %}
+            <div class="results">
+                {% if result.error %}
+                    <p class="error">Errore: {{ result.error }}</p>
+                {% else %}
+                    <h2>Risultati</h2>
+                    <p><strong>Chiave Pubblica:</strong> {{ result.pub_key }}</p>
+                    <p><strong>Chiave Privata:</strong> {{ result.priv_key }}</p>
+                    <p><strong>Cifrato:</strong> {{ result.cipher }}</p>
+                    <p><strong>Decifrato:</strong> {{ result.decipher }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
