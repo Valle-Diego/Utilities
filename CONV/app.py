@@ -92,7 +92,42 @@ def analizza_classless(cidr):
         "hosts":len(hosts),
         "tipo":"Privato" if net.is_private else "Pubblico"
     }
+# -------------------- FLSM --------------------
+def flsm_subnetting(network_base, num_subnet):
+    try:
+        base_network = ipaddress.ip_network(network_base, strict=False)
+        num_subnet = int(num_subnet)
+    except:
+        return None, "Parametri non validi."
 
+    if num_subnet <= 0:
+        return None, "Numero di subnet non valido."
+
+    # bit necessari per il numero di subnet
+    bits = math.ceil(math.log2(num_subnet))
+    new_prefix = base_network.prefixlen + bits
+
+    if new_prefix > 32:
+        return None, "Impossibile creare così tante subnet."
+
+    subnets = list(base_network.subnets(new_prefix=new_prefix))
+
+    result = []
+    for s in subnets[:num_subnet]:
+        hosts_available = s.num_addresses - 2 if s.num_addresses >= 2 else 0
+        first_host = s.network_address + 1 if hosts_available > 0 else None
+        last_host = s.broadcast_address - 1 if hosts_available > 0 else None
+
+        result.append({
+            "network": str(s.network_address),
+            "broadcast": str(s.broadcast_address),
+            "mask": str(s.netmask),
+            "prefix": s.prefixlen,
+            "host_disponibili": hosts_available,
+            "range": f"{first_host} - {last_host}" if first_host and last_host else "N/A"
+        })
+
+    return result, None
 # -------------------- VLSM --------------------
 def vlsm_subnetting(network_base, host_requirements):
     try: base_network=ipaddress.ip_network(network_base, strict=False)
@@ -166,6 +201,17 @@ def api_classless():
     val=data.get("valore")
     r=analizza_classless(val)
     return jsonify(r or {"errore":"CIDR non valido"})
+
+@app.route("/api/flsm", methods=["POST"])
+def api_flsm():
+    data = request.json
+    rete = data.get("rete")
+    subnet = data.get("subnet")
+
+    r, err = flsm_subnetting(rete, subnet)
+    if err:
+        return jsonify({"errore": err})
+    return jsonify({"subnets": r})
 
 @app.route("/api/vlsm", methods=["POST"])
 def api_vlsm():
