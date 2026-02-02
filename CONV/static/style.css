@@ -11,3 +11,20 @@ button {background:#167913; color:#000; border:none; padding:8px 14px; margin:4p
 button:hover {background:#1f7a1f;}
 .result-box {background:#0f0f0f; padding:10px; margin-top:10px; border-radius:4px; white-space:pre-wrap; font-family:monospace;}
 .vlsm_host {width:80px; margin:2px 4px 2px 0;}
+/* --- Routing --- */
+.routing_row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:8px;
+}
+
+.routing_row input{
+    width:220px;
+}
+
+#routing_res{
+    max-height:400px;
+    overflow:auto;
+}
+
