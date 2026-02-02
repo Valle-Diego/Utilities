@@ -17,6 +17,7 @@
         <div class="tab" data-tab="classless">Classless</div>
         <div class="tab" data-tab="flsm">FLSM</div>
         <div class="tab" data-tab="vlsm">VLSM</div>
+        <div class="tab" data-tab="routing">Routing</div>
     </div>
 
     <div class="tab-content active" id="numeri">
@@ -89,6 +90,24 @@
     </div>
 </div>
 
+<div class="tab-content" id="routing">
+    <h3>Routing Statico da Schema</h3>
+
+    <p>Inserisci le reti in ordine (RETE1 → RETE2 → RETE3)</p>
+
+    <div id="routing_reti">
+        <div class="routing_row">
+            <input type="text" class="routing_nome" placeholder="Nome rete (es: RETE1)">
+            <input type="text" class="routing_cidr" placeholder="CIDR (es: 192.168.1.0/24)">
+        </div>
+    </div>
+
+    <button onclick="aggiungiReteRouting()">Aggiungi Rete</button>
+    <button onclick="calcolaRouting()">Calcola Routing</button>
+
+    <pre class="result-box" id="routing_res"></pre>
+</div>
+
 <script>
 const tabs=document.querySelectorAll(".tab");
 tabs.forEach(t=>{
@@ -151,6 +170,43 @@ async function calcolaFLSM(){
     let subnet = document.getElementById("flsm_subnet").value;
     let res = await fetch("/api/flsm",{method: "POST",headers: {"Content-Type": "application/json"},body: JSON.stringify({rete: rete,subnet: subnet})});
     document.getElementById("flsm_res").textContent=JSON.stringify(await res.json(), null, 2);
+}
+
+function aggiungiReteRouting(){
+    let div=document.createElement("div");
+    div.classList.add("routing_row");
+    div.innerHTML=`
+        <input type="text" class="routing_nome" placeholder="Nome rete (es: RETE2)">
+        <input type="text" class="routing_cidr" placeholder="CIDR (es: 192.168.2.0/24)">
+    `;
+    document.getElementById("routing_reti").appendChild(div);
+}
+
+async function calcolaRouting(){
+    let rows=document.querySelectorAll(".routing_row");
+    let reti=[];
+
+    rows.forEach(r=>{
+        let nome=r.querySelector(".routing_nome").value;
+        let cidr=r.querySelector(".routing_cidr").value;
+        if(nome && cidr){
+            reti.push({nome:nome, cidr:cidr});
+        }
+    });
+
+    if(reti.length < 2){
+        alert("Inserisci almeno due reti");
+        return;
+    }
+
+    let res=await fetch("/api/routing-schema",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({reti:reti})
+    });
+
+    document.getElementById("routing_res").textContent =
+        JSON.stringify(await res.json(), null, 2);
 }
     
 </script>
