@@ -161,6 +161,84 @@ def vlsm_subnetting(network_base, host_requirements):
         current=int(candidate.broadcast_address)+1
     return result,None
 
+# -------------------- Routing statico da schema --------------------
+def genera_routing_da_schema(reti):
+    """
+    reti = [
+      {"nome": "RETE1", "cidr": "192.168.1.0/24"},
+      {"nome": "RETE2", "cidr": "192.168.2.0/24"},
+      {"nome": "RETE3", "cidr": "192.168.3.0/24"}
+    ]
+    """
+
+    networks = []
+    for r in reti:
+        try:
+            net = ipaddress.ip_network(r["cidr"], strict=False)
+        except:
+            return None, f"CIDR non valido: {r['cidr']}"
+
+        hosts = list(net.hosts())
+        if len(hosts) < 2:
+            return None, f"Rete {r['cidr']} senza host sufficienti"
+
+        networks.append({
+            "nome": r["nome"],
+            "net": net,
+            "mask": str(net.netmask),
+            "router_left": str(hosts[0]),
+            "router_right": str(hosts[1])
+        })
+
+    routers = {}
+
+    # numero router = numero reti - 1
+    for i in range(len(networks) - 1):
+        router_name = f"R{i+1}"
+        routing_table = []
+
+        # reti direttamente connesse
+        routing_table.append({
+            "rete": str(networks[i]["net"].network_address),
+            "mask": networks[i]["mask"],
+            "tipo": "Diretta",
+            "next_hop": None,
+            "interfaccia": "eth0"
+        })
+
+        routing_table.append({
+            "rete": str(networks[i+1]["net"].network_address),
+            "mask": networks[i+1]["mask"],
+            "tipo": "Diretta",
+            "next_hop": None,
+            "interfaccia": "eth1"
+        })
+
+        # reti indirette
+        for j in range(len(networks)):
+            if j == i or j == i + 1:
+                continue
+
+            if j < i:
+                next_hop = networks[i]["router_left"]
+                iface = "eth0"
+            else:
+                next_hop = networks[i+1]["router_right"]
+                iface = "eth1"
+
+            routing_table.append({
+                "rete": str(networks[j]["net"].network_address),
+                "mask": networks[j]["mask"],
+                "tipo": "Indiretta",
+                "next_hop": next_hop,
+                "interfaccia": iface
+            })
+
+        routers[router_name] = routing_table
+
+    return routers, None
+
+
 # -------------------- Routes --------------------
 @app.route("/")
 def index():
@@ -224,3 +302,17 @@ def api_vlsm():
 
 if __name__=="__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
+@app.route("/api/routing-schema", methods=["POST"])
+def api_routing_schema():
+    data = request.json
+    reti = data.get("reti")
+
+    if not reti or not isinstance(reti, list):
+        return jsonify({"errore": "Lista reti non valida"})
+
+    result, err = genera_routing_da_schema(reti)
+    if err:
+        return jsonify({"errore": err})
+
+    return jsonify(result)
